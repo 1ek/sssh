@@ -26,7 +26,7 @@ func getHosts() ([]string, error) {
 
 	var hosts []string
 	// Define a regular expression to match host names
-	hostRegex := regexp.MustCompile(`(?m)^Host\s+([^\s]+)`)
+	hostRegex := regexp.MustCompile(`(?m)^Host\s+([\w.-]+)$`)
 	// Find all matches of host names in the config file
 	matches := hostRegex.FindAllStringSubmatch(string(content), -1)
 	// Extract host names from the matches
@@ -37,6 +37,28 @@ func getHosts() ([]string, error) {
 }
 
 func main() {
+	var base *huh.Theme = huh.ThemeBase()
+	var base16 *huh.Theme = huh.ThemeBase16()
+	var dracula *huh.Theme = huh.ThemeDracula()
+	var charm *huh.Theme = huh.ThemeCharm()
+	var catppuccin *huh.Theme = huh.ThemeCatppuccin()
+
+	themeEnv := os.Getenv("SSSH_THEME")
+	var selectedTheme *huh.Theme
+	switch themeEnv {
+	case "base":
+		selectedTheme = base
+	case "base16":
+		selectedTheme = base16
+	case "dracula":
+		selectedTheme = dracula
+	case "charm":
+		selectedTheme = charm
+	case "catppuccin":
+		selectedTheme = catppuccin
+	default:
+		selectedTheme = dracula
+	}
 	// Retrieve the list of hosts from the SSH config file
 	hosts, err := getHosts()
 	if err != nil {
@@ -49,8 +71,7 @@ func main() {
 		Title("Connect to: ").
 		Options(huh.NewOptions(hosts...)...).
 		Value(&host)
-
-	huh.NewForm(huh.NewGroup(s)).WithTheme(huh.ThemeDracula()).Run()
+	huh.NewForm(huh.NewGroup(s)).WithTheme(selectedTheme).Run()
 
 	if host == "" {
 		fmt.Println("No host selected. Exiting...")
