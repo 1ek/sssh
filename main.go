@@ -65,13 +65,22 @@ func main() {
 		fmt.Println("Error:", err)
 	}
 
+	var height int
+	l := len(hosts)
+	switch {
+	case l > 10:
+		height = 15
+	default:
+		height = l + 3
+	}
+
 	// Prompt the user to select a host
 	var host string
 	s := huh.NewSelect[string]().
 		Title("Connect to: ").
 		Options(huh.NewOptions(hosts...)...).
 		Value(&host)
-	huh.NewForm(huh.NewGroup(s)).WithTheme(selectedTheme).Run()
+	huh.NewForm(huh.NewGroup(s)).WithHeight(height).WithTheme(selectedTheme).Run()
 
 	if host == "" {
 		fmt.Println("No host selected. Exiting...")
